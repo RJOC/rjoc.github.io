@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Ryan O&#39;Connor</title>
+    
+    
+    
+    <link>https://rjoc.github.io/posts/</link>
+    <description>Recent content in Posts on Ryan O&#39;Connor</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 14 Dec 2021 17:40:26 -0800</lastBuildDate>
+    
+	<atom:link href="https://rjoc.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>EXCProject</title>
+      <link>https://rjoc.github.io/posts/excproject/</link>
+      <pubDate>Tue, 14 Dec 2021 17:40:26 -0800</pubDate>
+      
+      <guid>https://rjoc.github.io/posts/excproject/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          package imdb import scala.io.Source case class TitleBasics(tconst: String, titleType: Option[String], primaryTitle: Option[String], originalTitle: Option[String], isAdult: Int, startYear: Option[Int], endYear: Option[Int], runtimeMinutes: Option[Int], genres: Option[List[String]]) case class TitleRatings(tconst: String, averageRating: Float, numVotes: Int) case class TitleCrew(tconst: String, directors: Option[List[String]], writers: Option[List[String]]) case class NameBasics(nconst: String, primaryName: Option[String], birthYear: Option[Int], deathYear: Option[Int], primaryProfession: Option[List[String]], knownForTitles: Option[List[String]]) object ImdbAnalysis { // Hint: use a combination of `ImdbData.titleBasicsPath` and `ImdbData.parseTitleBasics`  val titleBasicsList: List[TitleBasics] = Source.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Comp project</title>
+      <link>https://rjoc.github.io/posts/myfirstpost/</link>
+      <pubDate>Tue, 14 Dec 2021 17:08:25 -0800</pubDate>
+      
+      <guid>https://rjoc.github.io/posts/myfirstpost/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          
+          
+        
+        </description>
+    </item>
+    
+  </channel>
+</rss>
