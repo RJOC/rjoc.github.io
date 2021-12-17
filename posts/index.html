@@ -172,8 +172,6 @@
         <div class="post-content">
           
             
-              package imdb import scala.io.Source case class TitleBasics(tconst: String, titleType: Option[String], primaryTitle: Option[String], originalTitle: Option[String], isAdult: Int, startYear: Option[Int], endYear: Option[Int], runtimeMinutes: Option[Int], genres: Option[List[String]]) case class TitleRatings(tconst: String, averageRating: Float, numVotes: Int) case class TitleCrew(tconst: String, directors: Option[List[String]], writers: Option[List[String]]) case class NameBasics(nconst: String, primaryName: Option[String], birthYear: Option[Int], deathYear: Option[Int], primaryProfession: Option[List[String]], knownForTitles: Option[List[String]]) object ImdbAnalysis { // Hint: use a combination of `ImdbData.titleBasicsPath` and `ImdbData.parseTitleBasics`  val titleBasicsList: List[TitleBasics] = Source.
-            
           
         </div>
         
