@@ -1,204 +1,545 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    
-      <title>
-        Categories ::
-        Ryan O&#39;Connor — Ryan&#39;s Website
-      </title>
-    
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta
-  name="description"
-  content=""
-/>
-<meta
-  name="keywords"
-  content=""
-/>
-<meta name="robots" content="noodp" />
-<link rel="canonical" href="https://rjoc.github.io/categories/" />
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC Analyst Interview — Alert Cheat Sheet</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#171a21;
+    --panel-border:#262b36;
+    --text:#e7e9ee;
+    --text-dim:#9aa3b2;
+    --accent:#5b9dff;
+    --accent-soft:#1c2b45;
+    --tag-red:#ff6b6b;
+    --tag-red-bg:#3a1c1c;
+    --tag-amber:#ffb454;
+    --tag-amber-bg:#3a2b12;
+    --tag-green:#5fd68a;
+    --tag-green-bg:#123a24;
+    --divider:#232735;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f5f6f8;
+      --panel:#ffffff;
+      --panel-border:#e3e6ec;
+      --text:#1b1f27;
+      --text-dim:#5b6472;
+      --accent:#2563eb;
+      --accent-soft:#e8f0ff;
+      --tag-red:#c62828;
+      --tag-red-bg:#fdecec;
+      --tag-amber:#b45f06;
+      --tag-amber-bg:#fdf1de;
+      --tag-green:#1e7e45;
+      --tag-green-bg:#e8f8ee;
+      --divider:#e9ebf0;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    padding:0 0 64px 0;
+  }
+  header{
+    padding:40px 24px 28px;
+    max-width:900px;
+    margin:0 auto;
+    border-bottom:1px solid var(--divider);
+  }
+  header h1{
+    font-size:28px;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    color:var(--text-dim);
+    margin:0;
+    font-size:15px;
+    max-width:640px;
+  }
+  .toc{
+    max-width:900px;
+    margin:24px auto 0;
+    padding:0 24px;
+  }
+  .toc-inner{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:12px;
+    padding:16px 20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 18px;
+  }
+  .toc-inner a{
+    color:var(--accent);
+    text-decoration:none;
+    font-size:13.5px;
+    white-space:nowrap;
+  }
+  .toc-inner a:hover{ text-decoration:underline; }
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:32px 24px 0;
+  }
+  section.category{
+    margin-bottom:36px;
+  }
+  section.category > h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--accent);
+    margin:0 0 14px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--divider);
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:14px;
+  }
+  .card-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .card-head h3{
+    font-size:16.5px;
+    margin:0;
+    font-weight:650;
+  }
+  .sev{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .sev-high{ color:var(--tag-red); background:var(--tag-red-bg); }
+  .sev-med{ color:var(--tag-amber); background:var(--tag-amber-bg); }
+  .sev-var{ color:var(--tag-green); background:var(--tag-green-bg); }
 
+  .card p{
+    margin:8px 0;
+    font-size:14.5px;
+    color:var(--text);
+  }
+  .card p.dim{ color:var(--text-dim); }
+  .row{
+    display:grid;
+    grid-template-columns:110px 1fr;
+    gap:4px 14px;
+    margin-top:12px;
+    font-size:14px;
+  }
+  .row .k{
+    color:var(--text-dim);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding-top:2px;
+  }
+  .row .v{ color:var(--text); }
+  .row + .row{ margin-top:6px; }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:6px;
+  }
+  .chip{
+    font-size:12px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-radius:6px;
+    padding:3px 8px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  .ask{
+    margin-top:12px;
+    padding:10px 14px;
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    font-size:13.5px;
+    font-style:italic;
+    color:var(--text);
+  }
+  footer{
+    max-width:900px;
+    margin:0 auto;
+    padding:24px;
+    color:var(--text-dim);
+    font-size:12.5px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
 
-
-
-
-<link rel="stylesheet" href="https://rjoc.github.io/assets/style.css" />
-
-<link rel="stylesheet" href="https://rjoc.github.io/style.css" />
-
-
-<link
-  rel="apple-touch-icon-precomposed"
-  sizes="144x144"
-  href="https://rjoc.github.io/img/apple-touch-icon-144-precomposed.png"
-/>
-<link rel="shortcut icon" href="https://rjoc.github.io/img/favicon.png" />
-
-
-<link href="https://rjoc.github.io/assets/fonts/Inter-Italic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-<link href="https://rjoc.github.io/assets/fonts/Inter-Regular.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-<link href="https://rjoc.github.io/assets/fonts/Inter-Medium.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-<link href="https://rjoc.github.io/assets/fonts/Inter-MediumItalic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-<link href="https://rjoc.github.io/assets/fonts/Inter-Bold.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-<link href="https://rjoc.github.io/assets/fonts/Inter-BoldItalic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
-
-
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Categories"/>
-<meta name="twitter:description" content=""/>
-
-
-
-<meta property="og:title" content="Categories" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://rjoc.github.io/categories/" /><meta property="og:site_name" content="Ryan O&#39;Connor" />
-
-
-
-
-<link rel="alternate" type="application/rss+xml" href="/categories/index.xml" title="Ryan O'Connor" />
-
-
-
-  </head>
-  <body class="dark-theme">
-    <div class="container">
-      <header class="header">
-  <span class="header__inner">
-    <a
-  href="/"
-  class="logo"
-  style="text-decoration: none;"
->
-  
-    <span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44">
-  <path fill="none" d="M15 8l14.729 14.382L15 35.367" />
-</svg>
-</span>
-    <span class="logo__text"
-      >Ryan O&#39;Connor</span
-    >
-    <span class="logo__cursor"></span>
-  
-</a>
-
-    <span class="header__right">
-      
-        <nav class="menu">
-  <ul class="menu__inner menu__inner--desktop">
-    
-      
-        
-          <li><a href="/about">About</a></li>
-        
-      
-        
-          <li><a href="/tags/project">Projects</a></li>
-        
-      
-      
-      
-  </ul>
-
-  <ul class="menu__inner menu__inner--mobile">
-    
-      
-        <li><a href="/about">About</a></li>
-      
-    
-      
-        <li><a href="/tags/project">Projects</a></li>
-      
-    
-  </ul>
-</nav>
-
-        <span class="menu-trigger">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M0 0h24v24H0z" fill="none" />
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
-          </svg>
-        </span>
-      
-      <span class="theme-toggle">
-        <svg
-  class="theme-toggler"
-  width="24"
-  height="24"
-  viewBox="0 0 48 48"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
-  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
-  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"
-  />
-</svg>
-
-      </span>
-    </span>
-  </span>
+<header>
+  <h1>SOC Analyst Interview — Alert Cheat Sheet</h1>
+  <p>The alert types most likely to come up as "walk me through how you'd triage this" questions. For each: what fires it, what you'd check first, and the line an interviewer is actually listening for.</p>
 </header>
 
-
-      <div class="content">
-        
-  <div class="terms">
-    <h1>Categories</h1>
-    <ul class="terms__list">
-      
-      
-    </ul>
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#email">Email &amp; Phishing</a>
+    <a href="#endpoint">Endpoint &amp; Malware</a>
+    <a href="#identity">Identity &amp; Access</a>
+    <a href="#network">Network Alerts</a>
+    <a href="#data">Data &amp; Insider Risk</a>
+    <a href="#compliance">Compliance &amp; Risk</a>
+    <a href="#netfund">Network Fundamentals</a>
+    <a href="#attackdefense">Attack &amp; Defense</a>
   </div>
+</nav>
 
+<main>
+
+  <section class="category" id="email">
+    <h2>Email &amp; Phishing</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Phishing / suspicious email reported</h3>
+        <span class="sev sev-high">High</span>
       </div>
-
-      
-        <footer class="footer">
-  <div class="footer__inner">
-    
-      <a
-  href="/"
-  class="logo"
-  style="text-decoration: none;"
->
-  
-    <span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44">
-  <path fill="none" d="M15 8l14.729 14.382L15 35.367" />
-</svg>
-</span>
-    <span class="logo__text"
-      >Ryan O&#39;Connor</span
-    >
-    <span class="logo__cursor"></span>
-  
-</a>
-
-      <div class="copyright">
-        <span
-          >© 2021 Powered by
-          <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a></span
-        >
-        <span
-          >Theme created by
-          <a href="https://twitter.com/panr" target="_blank" rel="noopener">panr</a></span
-        >
-      </div>
-    
-  </div>
-</footer>
-
-<script src="https://rjoc.github.io/assets/main.js"></script>
-<script src="https://rjoc.github.io/assets/prism.js"></script>
-
-
-      
+      <div class="row"><div class="k">Fires on</div><div class="v">User-reported email, or gateway rule (e.g. credential-harvesting link pattern)</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Raw headers — SPF/DKIM/DMARC in Authentication-Results, From vs Return-Path, sender domain age</div></div>
+      <div class="row"><div class="k">Scope it</div><div class="v">Search mail logs for same sender/subject/URL hash across the whole org, not just the reporter</div></div>
+      <div class="row"><div class="k">Contain</div><div class="v">Block sender/URL/hash at gateway, purge from other inboxes, force reset if creds were entered</div></div>
+      <div class="chips"><span class="chip">Authentication-Results</span><span class="chip">SPF/DKIM/DMARC</span><span class="chip">urlscan.io</span><span class="chip">Message Trace (O365)</span></div>
+      <div class="ask">Interviewer wants to hear: did you check impact beyond the one reporting user, and did you verify whether credentials were actually submitted?</div>
     </div>
 
-    
-  </body>
+    <div class="card">
+      <div class="card-head">
+        <h3>Malicious attachment / macro-enabled document</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Sandbox detonation flags macro behavior, or AV/AMSI catches obfuscated VBA</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Detonate in sandbox, not locally; check hash against VirusTotal/threat intel</div></div>
+      <div class="row"><div class="k">Watch for</div><div class="v">Office app (winword.exe/excel.exe) spawning powershell.exe or cmd.exe — classic delivery chain</div></div>
+      <div class="chips"><span class="chip">Script Control / AMSI</span><span class="chip">Sandbox detonation</span><span class="chip">Process tree</span></div>
+      <div class="ask">Interviewer wants to hear: you recognize the parent-child process pattern (Office → PowerShell) as the signature of macro-based delivery.</div>
+    </div>
+  </section>
+
+  <section class="category" id="endpoint">
+    <h2>Endpoint &amp; Malware</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Suspicious / encoded PowerShell execution</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">AMSI-driven EDR alert, or command-line flags in process creation (Event 4688 / Sysmon ID 1)</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Command line for <span style="font-family:ui-monospace,monospace">-enc</span>, <span style="font-family:ui-monospace,monospace">-ExecutionPolicy Bypass</span>, <span style="font-family:ui-monospace,monospace">-WindowStyle Hidden</span>; parent process; any outbound connection right after launch</div></div>
+      <div class="row"><div class="k">Key concept</div><div class="v">AMSI inspects content in memory <em>after</em> deobfuscation — you don't need to manually decode it yourself</div></div>
+      <div class="chips"><span class="chip">AMSI</span><span class="chip">Falcon Script Control</span><span class="chip">Event ID 4104</span><span class="chip">IOA behavior graph</span></div>
+      <div class="ask">Interviewer wants to hear: you know how detection works without reading the script — AMSI/EDR content inspection plus behavioral signals (parent process, network activity), not just "I'd look at the code."</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Generic malware / AV-EDR detection</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Signature match, heuristic, or ML verdict from EDR agent</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Was it blocked/quarantined or just detected-and-allowed; file hash and prevalence across the fleet</div></div>
+      <div class="row"><div class="k">Scope it</div><div class="v">Same hash/IOC on other endpoints; how it landed (download, USB, email, lateral movement)</div></div>
+      <div class="chips"><span class="chip">Hash lookup</span><span class="chip">Fleet-wide search</span><span class="chip">Isolation</span></div>
+      <div class="ask">Interviewer wants to hear: containment (isolate the host) before full root-cause, and confirmation the block actually worked.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Ransomware indicators</h3>
+        <span class="sev sev-high">High — P1</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Mass file rename/encryption pattern, shadow copy deletion (vssadmin), backup deletion attempts</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Isolate the host immediately — this is a "contain now, investigate after" scenario</div></div>
+      <div class="row"><div class="k">Scope it</div><div class="v">Shared drives/network shares touched from that host; other machines showing the same pattern</div></div>
+      <div class="chips"><span class="chip">vssadmin delete shadows</span><span class="chip">Mass file modify rate</span><span class="chip">Network isolation</span></div>
+      <div class="ask">Interviewer wants to hear: speed and containment-first instinct — you isolate before you fully diagnose, because time directly equals blast radius here.</div>
+    </div>
+  </section>
+
+  <section class="category" id="identity">
+    <h2>Identity &amp; Access</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Failed login spike / brute force</h3>
+        <span class="sev sev-med">Medium–High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Threshold of failed auth attempts against one account or across many accounts from one source</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Single account (targeted) vs spray across many accounts (password spray); source IP reputation</div></div>
+      <div class="row"><div class="k">Escalate if</div><div class="v">A failure streak is followed by a success — that's the real signal, not the failures alone</div></div>
+      <div class="chips"><span class="chip">Sign-in logs</span><span class="chip">Conditional Access</span><span class="chip">IP reputation</span></div>
+      <div class="ask">Interviewer wants to hear: you check whether it eventually succeeded — failed logins alone are noisy, a success after failures is the actual incident.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Impossible travel / anomalous sign-in location</h3>
+        <span class="sev sev-med">Medium–High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Same account authenticating from two geographically distant locations in an impossible timeframe</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">VPN/corporate proxy exit points (common false positive); device compliance state; MFA method used</div></div>
+      <div class="row"><div class="k">Contain</div><div class="v">Revoke session tokens, force re-auth with MFA, reset credentials if compromise confirmed</div></div>
+      <div class="chips"><span class="chip">Sign-in logs</span><span class="chip">Token revocation</span><span class="chip">Device compliance</span></div>
+      <div class="ask">Interviewer wants to hear: you rule out the common false positive (corporate VPN) before treating it as a real compromise.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>MFA fatigue / push bombing</h3>
+        <span class="sev sev-med">Medium–High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Repeated MFA push notifications to one user in a short window</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Did the user ever accept one of the pushes; source IP of the requests</div></div>
+      <div class="row"><div class="k">Contain</div><div class="v">Reset credentials immediately if a push was accepted, treat as account compromise, not just noise</div></div>
+      <div class="chips"><span class="chip">Number matching MFA</span><span class="chip">Sign-in logs</span></div>
+      <div class="ask">Interviewer wants to hear: you know this is an attacker who already has valid credentials and is trying to bypass the second factor — not a benign glitch.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>New privileged account / unexpected admin role grant</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Account added to a privileged group (Domain Admins, Global Admin) outside change management</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Who made the change, was it via an approved ticket, does the account's normal behavior match admin activity</div></div>
+      <div class="chips"><span class="chip">Audit logs</span><span class="chip">Change ticket correlation</span></div>
+      <div class="ask">Interviewer wants to hear: you treat unexplained privilege escalation as a potential compromise indicator, not just an HR/IT process question.</div>
+    </div>
+  </section>
+
+  <section class="category" id="network">
+    <h2>Network Alerts</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>C2 beaconing / suspicious outbound traffic</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Regular-interval outbound connections to a rare or newly-registered domain/IP</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Destination reputation and domain age; beacon interval regularity; process that initiated the connection</div></div>
+      <div class="row"><div class="k">Contain</div><div class="v">Block at firewall/proxy (NGFW URL category), isolate host, hunt for the same IOC elsewhere</div></div>
+      <div class="chips"><span class="chip">NGFW URL filtering</span><span class="chip">newly-registered-domain</span><span class="chip">DNS logs</span></div>
+      <div class="ask">Interviewer wants to hear: you know beacon regularity (not just destination reputation) is itself a signal, and where to enforce the block (firewall/proxy vs endpoint).</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Web application firewall (WAF) alert — SQLi / injection attempt</h3>
+        <span class="sev sev-var">Varies</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Request payload matches known injection/exploit signature pattern</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">Was it blocked or just logged; source IP volume/pattern (scanner vs targeted); which endpoint was hit</div></div>
+      <div class="chips"><span class="chip">WAF logs</span><span class="chip">App error logs</span></div>
+      <div class="ask">Interviewer wants to hear: most WAF alerts are automated scanning noise — you triage by confirming the block held and checking for any successful response codes.</div>
+    </div>
+  </section>
+
+  <section class="category" id="data">
+    <h2>Data &amp; Insider Risk</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>DLP alert / unusual data exfiltration</h3>
+        <span class="sev sev-high">High</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Large or sensitive-labeled file upload/download, mass download, or transfer to personal cloud storage/USB</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">User's normal baseline behavior, data sensitivity/classification, destination (personal email, USB, unsanctioned cloud app)</div></div>
+      <div class="row"><div class="k">Escalate if</div><div class="v">Timing correlates with resignation, PIP, or a role change — pull in HR/legal, don't treat as pure IT ticket</div></div>
+      <div class="chips"><span class="chip">DLP policy match</span><span class="chip">CASB logs</span><span class="chip">HR correlation</span></div>
+      <div class="ask">Interviewer wants to hear: you know this often becomes a cross-functional case (HR/legal), not something a SOC analyst closes solo.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Removable media / USB alert</h3>
+        <span class="sev sev-med">Medium</span>
+      </div>
+      <div class="row"><div class="k">Fires on</div><div class="v">Unauthorized/unencrypted USB device connected, or policy blocks a write attempt</div></div>
+      <div class="row"><div class="k">Check first</div><div class="v">What was written/read, device serial history on that host, whether policy actually blocked the transfer</div></div>
+      <div class="chips"><span class="chip">Device control logs</span><span class="chip">DLP</span></div>
+      <div class="ask">Interviewer wants to hear: you distinguish a policy violation (annoying, low severity) from an actual successful data transfer (real incident).</div>
+    </div>
+  </section>
+
+  <section class="category" id="compliance">
+    <h2>Compliance &amp; Risk</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Risk fundamentals: likelihood × impact</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Risk = Likelihood × Impact. Used to decide what actually gets fixed first — not the same thing as raw technical severity.</div></div>
+      <div class="row"><div class="k">Know cold</div><div class="v">Inherent risk (before controls) vs residual risk (what's left after controls); risk appetite (how much you're willing to accept) vs risk tolerance (acceptable variance around that); four treatment options — accept, mitigate, transfer, avoid</div></div>
+      <div class="chips"><span class="chip">Residual risk</span><span class="chip">Risk register</span><span class="chip">Accept / Mitigate / Transfer / Avoid</span></div>
+      <div class="ask">Sample question: "How would you prioritize two vulnerabilities with the same CVSS score?" — good answer weighs business context: is it internet-facing, how critical is the asset, are there compensating controls — not just the raw score.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Policy vs standard vs procedure vs guideline</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">A governance hierarchy, top-down: Policy (high-level mandate — "passwords must meet complexity requirements") → Standard (specific measurable requirement — "minimum 14 characters, MFA required") → Procedure (step-by-step how-to for IT to implement it) → Guideline (recommended, not mandatory).</div></div>
+      <div class="chips"><span class="chip">Policy</span><span class="chip">Standard</span><span class="chip">Procedure</span><span class="chip">Guideline</span></div>
+      <div class="ask">Sample question: "What's the difference between a policy and a standard?" — answer with a concrete example pair, don't just define the terms abstractly.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Common compliance frameworks</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Different frameworks solve different problems — know what each is actually for, not just the acronym.</div></div>
+      <div class="row"><div class="k">Know cold</div><div class="v">NIST CSF — voluntary risk framework, 5 functions: Identify, Protect, Detect, Respond, Recover. ISO 27001 — certifiable ISMS standard with Annex A controls. SOC 2 — trust service criteria, common ask when vetting SaaS vendors. PCI-DSS — mandatory if you handle cardholder data. GDPR — EU data privacy regulation, not a security control framework.</div></div>
+      <div class="chips"><span class="chip">NIST CSF</span><span class="chip">ISO 27001</span><span class="chip">SOC 2</span><span class="chip">PCI-DSS</span><span class="chip">GDPR</span></div>
+      <div class="ask">Sample question: "Which framework would you check before onboarding a new vendor?" — answer depends on what the vendor handles: request their SOC 2 report for a SaaS tool, PCI-DSS attestation if they touch card data. Show judgment, not memorization.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Control types</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Controls are categorized two ways: by function (preventive, detective, corrective) and by nature (administrative, technical, physical).</div></div>
+      <div class="row"><div class="k">Examples</div><div class="v">Preventive = firewall rule blocking traffic. Detective = SIEM alert firing. Corrective = incident response runbook restoring a service. Administrative = security awareness training. Technical = MFA. Physical = badge access to a datacenter.</div></div>
+      <div class="ask">Sample question: "Give me an example of a detective control vs a preventive one." — have one crisp example of each ready, don't fumble for it live.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Audit findings &amp; compensating controls</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">When an audit finds a gap you can't immediately fix (e.g., a legacy system that can't support MFA), a compensating control offsets the risk in the meantime — network segmentation, enhanced logging, restricted access — until the real fix ships.</div></div>
+      <div class="ask">Sample question: "How would you handle an audit finding you can't fix right away?" — good answer: document a remediation plan with a timeline, propose a compensating control, and get formal risk acceptance from the right owner if the fix will be delayed a while. Shows you won't just let a finding sit silently.</div>
+    </div>
+  </section>
+
+  <section class="category" id="netfund">
+    <h2>Network Fundamentals</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>OSI model — mapped to security relevance</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Interviewers usually want you to map attacks and tools to layers, not recite all seven from memory.</div></div>
+      <div class="row"><div class="k">Know cold</div><div class="v">L2 (Data Link) — ARP spoofing, MAC flooding. L3 (Network) — IP spoofing, ICMP abuse. L4 (Transport) — TCP/UDP, port scanning, SYN floods. L7 (Application) — HTTP-based attacks, SQLi, XSS, phishing.</div></div>
+      <div class="ask">Sample question: "Where does DNS spoofing happen in the OSI model?" — DNS itself is L7, but cache-poisoning attacks exploit response-spoofing that touches L3/L4 too. The point is showing you can reason about it, not recite the stack top to bottom.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>TCP three-way handshake &amp; scanning</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">SYN → SYN-ACK → ACK establishes a TCP connection. Understanding this explains why a SYN ("half-open") scan is stealthier than a full connect scan, and why a SYN flood works as a DoS technique — the target holds open half-completed connections until resources exhaust.</div></div>
+      <div class="ask">Sample question: "How would you detect port scanning on your network?" — a high volume of SYN packets without completed handshakes from one source, sequential port attempts in firewall logs, or an IDS/IPS signature match.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Common ports &amp; protocols</h3>
+      </div>
+      <div class="row"><div class="k">Know cold</div><div class="v">These get asked directly, or embedded in a scenario ("what port would you expect in an SMB lateral movement attempt" → 445).</div></div>
+      <div class="chips"><span class="chip">22 SSH</span><span class="chip">23 Telnet</span><span class="chip">25 SMTP</span><span class="chip">53 DNS</span><span class="chip">80/443 HTTP/HTTPS</span><span class="chip">389/636 LDAP/LDAPS</span><span class="chip">445 SMB</span><span class="chip">3389 RDP</span><span class="chip">1433 MSSQL</span><span class="chip">3306 MySQL</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Firewall types &amp; segmentation</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Stateless (evaluates each packet in isolation) vs stateful (tracks connection state) vs NGFW (adds application-layer awareness, URL filtering, intrusion prevention). Segmentation — VLANs, subnets, zero trust boundaries — limits how far an attacker can move after landing on one host.</div></div>
+      <div class="ask">Sample question: "Why would you segment a network?" — to contain blast radius: a compromised workstation in one VLAN shouldn't be able to reach finance servers in another without crossing an enforced, logged boundary.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>DNS fundamentals &amp; abuse</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">DNS resolves names to IPs — and gets abused two main ways: DNS tunneling (encoding stolen data into subdomain queries to exfiltrate through a protocol that's rarely blocked outbound) and cache poisoning/typosquatting (redirecting users to malicious infrastructure).</div></div>
+      <div class="ask">Sample question: "How could DNS be used for data exfiltration?" — DNS tunneling: encode data into queries sent to an attacker-controlled authoritative nameserver, since outbound port 53 is almost never blocked the way other ports are.</div>
+    </div>
+  </section>
+
+  <section class="category" id="attackdefense">
+    <h2>Attack &amp; Defense</h2>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Cyber Kill Chain</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Lockheed Martin's 7-stage model of an attack: Reconnaissance → Weaponization → Delivery → Exploitation → Installation → Command &amp; Control → Actions on Objectives.</div></div>
+      <div class="ask">Sample question: "Where would you want to stop an attacker?" — as early as possible (recon/delivery) in principle, since damage compounds the further right you go — but be honest that most real-world detections land in the middle (exploitation/installation/C2), which is exactly why layered defense matters.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>MITRE ATT&amp;CK</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">A knowledge base of real-world adversary tactics and techniques (e.g., T1566 Phishing, T1059.001 PowerShell), used to benchmark what your detections actually cover — not a linear attack story like the kill chain.</div></div>
+      <div class="ask">Sample question: "How is ATT&amp;CK different from the kill chain?" — kill chain is a high-level linear lifecycle; ATT&amp;CK is a detailed, non-linear matrix of specific techniques used to map detection coverage and find gaps.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Defense in depth</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Layered controls so no single failure equals full compromise: perimeter (firewall) → network (segmentation) → endpoint (EDR) → identity (MFA) → data (encryption/DLP) → people (awareness training).</div></div>
+      <div class="ask">Sample question: "If an attacker gets past your firewall, what stops them next?" — walk through the next layers explicitly; don't just say the firewall should have caught it.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Red team vs blue team vs purple team</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Red = simulates attackers to find gaps (offensive). Blue = defenders — SOC, detection and response (defensive). Purple = a collaborative exercise where red and blue work together in real time so blue learns to detect the specific technique immediately, instead of reading about it in a report weeks later.</div></div>
+      <div class="ask">Sample question: "What's the value of purple teaming over a standard red team engagement?" — it closes the feedback loop faster; findings turn into working detections in the same session rather than sitting in a report.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Vulnerability vs exploit vs threat, and CVSS</h3>
+      </div>
+      <div class="row"><div class="k">Core idea</div><div class="v">Vulnerability = a weakness. Exploit = code or technique that takes advantage of it. Threat = someone with both intent and capability to actually use it against you. CVSS reflects technical severity, not business risk — a critical CVSS finding on an isolated, non-internet-facing test box is often lower real-world risk than a medium one on a public-facing system.</div></div>
+      <div class="ask">Sample question: "How do you prioritize vulnerability remediation?" — CVSS as a starting point, then weight by exposure (internet-facing?), asset criticality, and whether there's a known exploit actively used in the wild (CISA's KEV catalog is a good name to drop here).</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Attack technique quick hits</h3>
+      </div>
+      <div class="row"><div class="k">Know cold</div><div class="v">Be ready to define each in one sentence if asked cold.</div></div>
+      <div class="chips"><span class="chip">Pass-the-hash</span><span class="chip">Credential stuffing</span><span class="chip">Lateral movement</span><span class="chip">Privilege escalation</span><span class="chip">SQL injection</span><span class="chip">XSS</span><span class="chip">Supply chain attack</span><span class="chip">Zero-day</span></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Built for interview prep — for each alert, practice saying the "fires on / check first / contain" line out loud before naming the tool. The mechanism matters more than the product name.
+</footer>
+
+</body>
 </html>
