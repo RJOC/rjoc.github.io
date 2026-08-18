@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Story Bank — 4 Stories to Rehearse</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel-border:#262b36;
+    --text:#e7e9ee; --text-dim:#9aa3b2;
+    --accent:#5b9dff; --accent-soft:#1c2b45;
+    --tag-red:#ff6b6b; --tag-red-bg:#3a1c1c;
+    --tag-amber:#ffb454; --tag-amber-bg:#3a2b12;
+    --tag-green:#5fd68a; --tag-green-bg:#123a24;
+    --divider:#232735;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f5f6f8; --panel:#ffffff; --panel-border:#e3e6ec;
+      --text:#1b1f27; --text-dim:#5b6472;
+      --accent:#2563eb; --accent-soft:#e8f0ff;
+      --tag-red:#c62828; --tag-red-bg:#fdecec;
+      --tag-amber:#b45f06; --tag-amber-bg:#fdf1de;
+      --tag-green:#1e7e45; --tag-green-bg:#e8f8ee;
+      --divider:#e9ebf0;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; padding:0 0 64px; }
+  header{ padding:40px 24px 24px; max-width:860px; margin:0 auto; border-bottom:1px solid var(--divider); }
+  header h1{ font-size:26px; margin:0 0 8px; letter-spacing:-0.01em; }
+  header p{ color:var(--text-dim); margin:0; font-size:14.5px; max-width:620px; }
+  main{ max-width:860px; margin:0 auto; padding:28px 24px 0; }
+  .story{ background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
+    padding:22px 24px; margin-bottom:26px; }
+  .story-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px; flex-wrap:wrap; }
+  .story-head h2{ font-size:19px; margin:0; }
+  .badge{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+    padding:3px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
+  .story .sub{ color:var(--text-dim); font-size:13px; margin:0 0 16px; }
+  h3.section-label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-dim);
+    margin:18px 0 8px; }
+  .narrative{ background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:8px;
+    padding:14px 18px; font-size:14.5px; font-style:italic; }
+  .narrative p{ margin:0 0 10px; }
+  .narrative p:last-child{ margin-bottom:0; }
+  ul.lock{ margin:0; padding-left:20px; font-size:14px; }
+  ul.lock li{ margin-bottom:6px; }
+  .verify{ background:var(--tag-amber-bg); border-left:3px solid var(--tag-amber); border-radius:8px;
+    padding:12px 16px; font-size:13.5px; color:var(--text); margin-top:8px; }
+  .verify strong{ color:var(--tag-amber); }
+  .writeout{ margin-top:16px; border:1px dashed var(--panel-border); border-radius:8px; padding:14px 16px;
+    font-size:13px; color:var(--text-dim); }
+  .writeout ol{ margin:6px 0 0; padding-left:20px; }
+  .writeout li{ margin-bottom:4px; }
+  footer{ max-width:860px; margin:0 auto; padding:24px; color:var(--text-dim); font-size:12.5px; text-align:center; }
+  .back-link{ max-width:860px; margin:0 auto; padding:20px 24px 0; }
+  .back-link a{ color:var(--text-dim); text-decoration:none; font-size:13px; display:inline-flex; align-items:center; gap:6px; }
+  .back-link a:hover{ color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="back-link"><a href="../index.html">&larr; RJOC Operations Centre</a></div>
+
+<header>
+  <h1>Interview Story Bank — 4 Stories to Rehearse</h1>
+  <p>The four incidents from tonight's mock session, cleaned up with everything we corrected during drilling. For each: the tightened narrative to read aloud, the facts to lock down so they don't shift under follow-up, and anything still flagged for you to verify for real before Thursday.</p>
+</header>
+
+<main>
+
+  <div class="story">
+    <div class="story-head">
+      <h2>1. ClickFix — PowerShell via Run Dialog</h2>
+      <span class="badge">Endpoint</span>
+    </div>
+    <p class="sub">Customer environment · confirmed compromise · escalated</p>
+
+    <h3 class="section-label">The tightened narrative</h3>
+    <div class="narrative">
+      <p>"I picked up an alert where PowerShell had spawned as a child of explorer.exe — significant because that pattern points to a Run-dialog execution rather than a normal script launch. Before digging further, I pulled the user's role from Entra ID and found they were in a non-technical, customer-facing role, so PowerShell activity on that account was already unusual on its own.</p>
+      <p>I checked the SIEM and saw the user had browsed to an atypical site shortly before the PowerShell execution — consistent with a ClickFix-style attack, where a fake CAPTCHA page tricks the user into pasting and running a command via the Run dialog. I confirmed that by pulling the RunMRU registry key, which showed the literal command typed into the Run box: a plaintext PowerShell one-liner using curl to pull down a second-stage script.</p>
+      <p>At that point I treated it as a confirmed compromise rather than investigating further while the host stayed live — our EDR had already logged the outbound connection, so isolating it wouldn't cost me that visibility, it would just stop anything further. I isolated the host through our standard containment playbook and disabled the user's account. I then checked whether any other users had hit the same domain to rule out a broader campaign — that came back clean, so I scoped it as an isolated incident.</p>
+      <p>I added the domain and related indicators to our blocklist, documented the full timeline, and escalated to the customer with two recommendations: implement an execution policy restricting PowerShell for standard users, since nothing was blocking it here, and add user awareness training on fake-CAPTCHA social engineering, since that was the actual entry point. The deeper reverse-engineering of the second-stage payload was handed to a specialized resource — determining exactly what it did wasn't something I tracked to closure myself."</p>
+    </div>
+
+    <h3 class="section-label">Lock these down</h3>
+    <ul class="lock">
+      <li>Parent process is <strong>explorer.exe</strong>, not chrome.exe — chrome is just where the user hit the fake CAPTCHA page.</li>
+      <li>Evidence chain in order: Entra ID role check → SIEM browsing history → RunMRU registry (actual command) → confirmed compromise.</li>
+      <li>Why isolate immediately: EDR already logged the outbound connection, so isolating cost zero visibility — say this reasoning explicitly, it's the strongest line in the story.</li>
+      <li>Second-stage payload outcome is genuinely unknown / handed off — say that plainly, don't guess.</li>
+    </ul>
+    <div class="verify"><strong>Still verify for real:</strong> who actually executed the host isolation — you, or was it done via a pre-approved automated playbook, or did it require the customer's retainer? This shifted three times in tonight's run-through. Check the ticket and get one clean answer before Thursday.</div>
+
+    <div class="writeout">
+      Write your own version below — same structure, your words:
+      <ol>
+        <li>What fired, first fact you checked</li>
+        <li>How you scoped severity</li>
+        <li>What confirmed it was real (evidence chain)</li>
+        <li>What you contained/isolated, and why in that order</li>
+        <li>Who you told, what you recommended</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="story">
+    <div class="story-head">
+      <h2>2. Phishing Email — User-Reported</h2>
+      <span class="badge">Email</span>
+    </div>
+    <p class="sub">O365 / Exchange · solo-owned · true positive</p>
+
+    <h3 class="section-label">The tightened narrative</h3>
+    <div class="narrative">
+      <p>"A user reported a phishing email through the O365 report button, which quarantined it and fired an alert — though our phishing analyzer's enrichment didn't populate this time, so I worked it manually. I called the user directly and walked them through pulling the raw email from Exchange so I could get the full headers.</p>
+      <p>Looking at the headers, SPF and DKIM both failed, and the Return-Path didn't match the visible From address — three converging signals, not just one. That was enough to act. I made the block decision based on the header analysis alone, without waiting to sandbox the URL first, because blocking a URL and sending domain org-wide is a cheap, reversible action — if I'm wrong, I just unblock it. The priority was making sure no one else in the environment could reach that link while it was still sitting in other inboxes.</p>
+      <p>I then scoped it — searched for any other users who'd received mail from the same domain, and found two more who had it in their inbox but hadn't interacted with it. I purged the message from their mailboxes, notified them, documented the full timeline, and closed it out as a true positive."</p>
+    </div>
+
+    <h3 class="section-label">Lock these down</h3>
+    <ul class="lock">
+      <li>Three signals, not one: SPF fail + DKIM fail + Return-Path/From mismatch — don't just say "DMARC failed" on its own, that's not proof by itself.</li>
+      <li>Why you blocked before sandboxing: low-cost, reversible action, speed matters more than certainty here — contrast this explicitly with a higher-stakes action like host isolation if asked.</li>
+      <li>Be precise about "hadn't opened" vs "hadn't clicked" — know which one you actually verified.</li>
+    </ul>
+    <div class="verify"><strong>Still verify for real:</strong> what system actually feeds the URL click-tracking data inside BlueMatter for this customer — Safe Links, a secure email gateway, something else? Confirm this with a teammate or the docs, don't guess it live in the interview.</div>
+
+    <div class="writeout">
+      Write your own version below — same structure, your words:
+      <ol>
+        <li>How it was reported, what tooling fired</li>
+        <li>What you pulled to verify (headers, specific fields)</li>
+        <li>Why you were confident enough to act, and how fast</li>
+        <li>How you scoped to other users</li>
+        <li>Close-out and recommendation</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="story">
+    <div class="story-head">
+      <h2>3. Impossible Travel — GlobalProtect VPN</h2>
+      <span class="badge sev-var" style="background:var(--tag-green-bg);color:var(--tag-green);">False Positive</span>
+    </div>
+    <p class="sub">Identity · newly onboarded VPN tech · tuned after close</p>
+
+    <h3 class="section-label">The tightened narrative</h3>
+    <div class="narrative">
+      <p>"I picked up an impossible-travel alert and started with the basics — user, source IP, ASN. The first login was from the user's normal, AD-confirmed work location. The second was from an IP range I didn't recognize, so I checked it in VirusTotal — a community comment flagged it as Palo Alto Networks, and I cross-validated that independently through a WHOIS lookup rather than trusting the comment alone. It turned out to be a GlobalProtect VPN egress range the customer had just onboarded, before we'd tuned alerting for it.</p>
+      <p>I corroborated it further — MFA had succeeded on both logins, and the second one fell within the user's normal working hours, both pulled from AD enrichment. No containment was needed. The reason this isn't real impossible travel is the alert logic itself: it assumes source-IP geolocation reflects where the human physically is. A VPN egress node's geolocation reflects where the VPN server is hosted, which can be a completely different location from the user — so there was no actual travel to explain, the alert's underlying assumption was just broken by the VPN.</p>
+      <p>I documented it and tuned out the known GlobalProtect ranges for that customer, though the better long-term fix is tuning by ASN or vendor rather than a static IP list, since VPN providers rotate and add egress IPs constantly. Closed as false positive."</p>
+    </div>
+
+    <h3 class="section-label">Lock these down</h3>
+    <ul class="lock">
+      <li>Have the impossible-travel mechanism memorized word for word — this gets asked as a standalone definitional question too, not just inside a story.</li>
+      <li>VirusTotal methodology: community comment as a <em>lead</em>, WHOIS as the <em>validation</em> — don't skip the second step when you tell it.</li>
+      <li>Corroboration beyond the IP: MFA success + working-hours pattern from AD — this is what actually closes the loop on "was this really the user."</li>
+    </ul>
+
+    <div class="writeout">
+      Write your own version below — same structure, your words:
+      <ol>
+        <li>What fired, first facts pulled</li>
+        <li>How you identified the second IP</li>
+        <li>What corroborated it was legitimate</li>
+        <li>Why it's not really "impossible" — the mechanism</li>
+        <li>What you tuned, and the better long-term fix</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="story">
+    <div class="story-head">
+      <h2>4. EDR Auto-Quarantine — Discord Download</h2>
+      <span class="badge">Endpoint</span>
+    </div>
+    <p class="sub">Malware · auto-contained by EDR · true positive</p>
+
+    <h3 class="section-label">The tightened narrative</h3>
+    <div class="narrative">
+      <p>"EDR had already flagged and quarantined a malicious file on a host by the time I picked up the ticket. I logged in and confirmed the quarantine, then checked process creation events to see whether anything had actually executed and spawned before the quarantine caught it — that's the real question once something's quarantined, since the file being blocked doesn't guarantee nothing ran first.</p>
+      <p>In the SIEM, I traced it back to the user downloading the file directly from a Discord link. Rather than recommending a blanket block of the whole platform — which could create real friction if any team legitimately uses Discord — I recommended a more targeted fix: content-category filtering or application control on executable downloads regardless of source, which addresses the actual problem instead of just this one site.</p>
+      <p>I documented the full timeline, escalated to the customer, and closed it out as a true positive."</p>
+    </div>
+
+    <h3 class="section-label">Lock these down</h3>
+    <ul class="lock">
+      <li>Keep the checks scenario-specific: process creation and persistence (run keys, scheduled tasks), not RunMRU or mailbox rules — those belong to different attack vectors, don't carry them over.</li>
+      <li>The recommendation should be precise, not blanket — "block Discord" is weaker than "filter by category / control executable downloads regardless of source."</li>
+      <li>Say it as true positive from the start — this is the one that got corrected mid-sentence tonight, make sure it's automatic by Thursday.</li>
+    </ul>
+
+    <div class="writeout">
+      Write your own version below — same structure, your words:
+      <ol>
+        <li>What EDR already did before you touched it</li>
+        <li>What you checked next, and why it's still relevant even though it's contained</li>
+        <li>How you traced the source</li>
+        <li>Your recommendation, and why it's the precise version not the blanket one</li>
+      </ol>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Write each one out in your own words tomorrow — the goal isn't to memorize this exact phrasing, it's to lock the timeline and facts in your own head so nothing shifts under a follow-up question.
+</footer>
+
+</body>
+</html>

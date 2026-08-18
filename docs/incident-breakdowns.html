@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Breakdowns — Musgrave, M&amp;S, Co-op, Harrods &amp; JLR</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel-border:#262b36;
+    --text:#e7e9ee; --text-dim:#9aa3b2;
+    --accent:#5b9dff; --accent-soft:#1c2b45;
+    --tag-red:#ff6b6b; --tag-red-bg:#3a1c1c;
+    --tag-amber:#ffb454; --tag-amber-bg:#3a2b12;
+    --tag-green:#5fd68a; --tag-green-bg:#123a24;
+    --divider:#232735;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f5f6f8; --panel:#ffffff; --panel-border:#e3e6ec;
+      --text:#1b1f27; --text-dim:#5b6472;
+      --accent:#2563eb; --accent-soft:#e8f0ff;
+      --tag-red:#c62828; --tag-red-bg:#fdecec;
+      --tag-amber:#b45f06; --tag-amber-bg:#fdf1de;
+      --tag-green:#1e7e45; --tag-green-bg:#e8f8ee;
+      --divider:#e9ebf0;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; padding:0 0 64px;
+  }
+  .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .back-link{ max-width:900px; margin:0 auto; padding:20px 24px 0; }
+  .back-link a{ color:var(--text-dim); text-decoration:none; font-size:13px; display:inline-flex; align-items:center; gap:6px; }
+  .back-link a:hover{ color:var(--accent); }
+
+  header{ padding:32px 24px 24px; max-width:900px; margin:0 auto; border-bottom:1px solid var(--divider); }
+  header h1{ font-size:27px; margin:0 0 8px; letter-spacing:-0.01em; }
+  header p{ color:var(--text-dim); margin:0; font-size:14.5px; max-width:660px; }
+
+  nav.toc{ max-width:900px; margin:24px auto 0; padding:0 24px; }
+  .toc-inner{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:12px;
+    padding:14px 20px; display:flex; flex-wrap:wrap; gap:8px 18px;
+  }
+  .toc-inner a{ color:var(--accent); text-decoration:none; font-size:13.5px; white-space:nowrap; }
+  .toc-inner a:hover{ text-decoration:underline; }
+
+  main{ max-width:900px; margin:0 auto; padding:36px 24px 0; }
+
+  section.incident{ margin-bottom:56px; }
+  .incident-head{ margin-bottom:6px; }
+  .incident-eyebrow{
+    font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em;
+    color:var(--accent); margin-bottom:8px;
+  }
+  .incident-head h2{ font-size:24px; margin:0 0 8px; letter-spacing:-0.01em; }
+  .incident-badges{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .badge{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    padding:4px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .badge-sector{ background:var(--accent-soft); color:var(--accent); }
+  .badge-actor{ background:var(--tag-red-bg); color:var(--tag-red); }
+  .badge-date{ background:var(--panel); color:var(--text-dim); border:1px solid var(--panel-border); }
+  .badge-good{ background:var(--tag-green-bg); color:var(--tag-green); }
+
+  .stat-strip{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px;
+    background:var(--panel-border); border:1px solid var(--panel-border);
+    border-radius:12px; overflow:hidden; margin:18px 0 28px;
+  }
+  .stat{ background:var(--panel); padding:16px 18px; }
+  .stat .n{ font-size:21px; font-weight:800; color:var(--text); }
+  .stat .n.small{ font-size:15.5px; }
+  .stat .l{ font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-dim); margin-top:4px; }
+
+  h3.section-label{
+    font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim);
+    margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--divider);
+  }
+
+  .timeline{ list-style:none; margin:0 0 30px; padding:0; position:relative; }
+  .timeline::before{
+    content:""; position:absolute; left:5px; top:6px; bottom:6px; width:1px; background:var(--divider);
+  }
+  .timeline li{ position:relative; padding:0 0 18px 26px; font-size:14px; }
+  .timeline li:last-child{ padding-bottom:0; }
+  .timeline li::before{
+    content:""; position:absolute; left:0; top:5px; width:11px; height:11px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--accent);
+  }
+  .timeline .when{
+    display:block; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--accent); margin-bottom:3px;
+  }
+  .timeline .what{ color:var(--text); }
+
+  .chain{ display:flex; flex-direction:column; gap:0; margin:0 0 30px; }
+  .chain-step{
+    display:flex; gap:16px; padding:14px 0; border-bottom:1px solid var(--divider);
+  }
+  .chain-step:last-child{ border-bottom:none; }
+  .chain-num{
+    flex:none; width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent);
+    font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center;
+  }
+  .chain-body h4{ margin:0 0 4px; font-size:14.5px; font-weight:650; }
+  .chain-body p{ margin:0; font-size:13.5px; color:var(--text-dim); }
+
+  .lessons{
+    background:var(--tag-amber-bg); border-left:3px solid var(--tag-amber); border-radius:8px;
+    padding:16px 20px; margin-bottom:6px;
+  }
+  .lessons h3{ margin:0 0 10px; font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--tag-amber); }
+  .lessons ul{ margin:0; padding-left:20px; font-size:13.5px; }
+  .lessons li{ margin-bottom:8px; }
+  .lessons li:last-child{ margin-bottom:0; }
+
+  .note{
+    font-size:13px; color:var(--text-dim); margin:0 0 24px; font-style:italic;
+  }
+
+  .shared{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:12px;
+    padding:22px 24px; margin-bottom:40px;
+  }
+  .shared h2{ font-size:13px; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); margin:0 0 12px; }
+  .shared p{ font-size:14px; margin:0 0 10px; color:var(--text); }
+  .shared p:last-child{ margin-bottom:0; }
+
+  .sources{ margin-top:8px; }
+  .sources h3{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim); margin:0 0 10px; }
+  .sources ul{ margin:0; padding-left:18px; font-size:12.5px; }
+  .sources li{ margin-bottom:5px; }
+  .sources a{ color:var(--text-dim); }
+  .sources a:hover{ color:var(--accent); }
+
+  footer{ max-width:900px; margin:0 auto; padding:24px; color:var(--text-dim); font-size:12.5px; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="back-link"><a href="../index.html">&larr; RJOC Operations Centre</a></div>
+
+<header>
+  <h1>Incident Breakdowns — Retail &amp; Manufacturing Cyberattacks</h1>
+  <p>Full breakdowns of five UK-linked cyberattacks spanning 2017 to 2025: Musgrave, Marks &amp; Spencer, Co-op, Harrods, and Jaguar Land Rover. Four of the five trace back to the exact same weak point — an IT helpdesk that trusted a phone call.</p>
+</header>
+
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#musgrave">Musgrave (2017)</a>
+    <a href="#ms">Marks &amp; Spencer</a>
+    <a href="#coop">Co-op</a>
+    <a href="#harrods">Harrods</a>
+    <a href="#jlr">Jaguar Land Rover</a>
+    <a href="#shared">Shared Pattern</a>
+    <a href="#sources">Sources</a>
+  </div>
+</nav>
+
+<main>
+
+  <section class="incident" id="musgrave">
+    <div class="incident-head">
+      <div class="incident-eyebrow">Retail / Point-of-Sale Malware</div>
+      <h2>Musgrave (SuperValu, Centra, Daybreak)</h2>
+      <div class="incident-badges">
+        <span class="badge badge-sector">Retail / Grocery</span>
+        <span class="badge badge-actor">Unattributed</span>
+        <span class="badge badge-date">October 2017</span>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n">3</div><div class="l">Store brands targeted</div></div>
+      <div class="stat"><div class="n small">Card no. + expiry</div><div class="l">Data malware sought</div></div>
+      <div class="stat"><div class="n badge-good" style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:15px;">No confirmed theft</div><div class="l">Outcome at disclosure</div></div>
+    </div>
+
+    <h3 class="section-label">Timeline</h3>
+    <ul class="timeline">
+      <li><span class="when">2017</span><span class="what">Musgrave's internal monitoring detects malicious software running inside its retail network, spanning the SuperValu, Centra, and Daybreak store brands.</span></li>
+      <li><span class="when">Oct 2017</span><span class="what">Musgrave publicly discloses the incident, stating the malware attempted to extract debit and credit card numbers and expiry dates only — not cardholder names, PINs, or CVV codes.</span></li>
+      <li><span class="when">Oct 2017</span><span class="what">No evidence emerges that any card data was actually exfiltrated. Musgrave nonetheless advises customers to check bank statements as a precaution.</span></li>
+      <li><span class="when">Oct 2017</span><span class="what">The Irish Office of the Data Protection Commissioner and An Garda Síochána (Irish police) are notified; Musgrave engages a cyber breach response consultancy and applies technical fixes.</span></li>
+    </ul>
+
+    <h3 class="section-label">Attack chain</h3>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-body"><h4>Network intrusion</h4><p>Attackers gained a foothold inside Musgrave's retail network. The specific initial-access method was never made public.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-body"><h4>Point-of-sale targeting</h4><p>Malware was placed with the specific goal of scraping card numbers and expiry dates from payment terminals or the systems processing them — the signature of point-of-sale (PoS) card-skimming malware common in this era.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-body"><h4>Narrow data scope</h4><p>The malware targeted card numbers and expiry only, skipping cardholder names, PINs, and CVVs — consistent with card-cloning intent rather than full identity theft.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-body"><h4>Detected before confirmed loss</h4><p>Musgrave's own monitoring caught the malware and it was neutralized with technical fixes before any theft was confirmed.</p></div>
+      </div>
+    </div>
+
+    <div class="lessons">
+      <h3>Lessons learned</h3>
+      <ul>
+        <li>Card-present malware doesn't need your identity systems — it just needs a foothold near the payment path. Segmenting PoS/payment networks from the rest of the retail estate limits what an attacker can reach even after a breach.</li>
+        <li>Detecting malware before data leaves is a real, achievable goal, not just a consolation prize — Musgrave's outcome (attempt confirmed, theft not confirmed) shows monitoring paid off even without full prevention.</li>
+        <li>EMV chip and tokenization reduce the resale value of stolen magstripe-style card data, which is part of why this exact attack shape became less common as payment infrastructure modernized after 2017.</li>
+        <li>Notify regulators and law enforcement early even absent confirmed harm — looping in the Irish DPC and Garda immediately, rather than waiting for proof of loss, is the model.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="incident" id="ms">
+    <div class="incident-head">
+      <div class="incident-eyebrow">Retail / Ransomware</div>
+      <h2>Marks &amp; Spencer</h2>
+      <div class="incident-badges">
+        <span class="badge badge-sector">Retail</span>
+        <span class="badge badge-actor">Scattered Spider / DragonForce</span>
+        <span class="badge badge-date">April 2025</span>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n">£300m</div><div class="l">Hit to annual profit</div></div>
+      <div class="stat"><div class="n">£3.8m</div><div class="l">Avg. daily loss, online down</div></div>
+      <div class="stat"><div class="n">£500m+</div><div class="l">Wiped off market cap</div></div>
+      <div class="stat"><div class="n">~6 wks</div><div class="l">Online orders disrupted</div></div>
+    </div>
+
+    <h3 class="section-label">Timeline</h3>
+    <ul class="timeline">
+      <li><span class="when">Est. Feb 2025</span><span class="what">Attackers are believed to have gained initial access to M&amp;S's network weeks before the ransomware detonated — the intrusion sat quietly before being weaponized.</span></li>
+      <li><span class="when">Apr 21, 2025</span><span class="what">Customers start reporting failed contactless payments and broken Click &amp; Collect bookings in stores.</span></li>
+      <li><span class="when">Apr 22–23, 2025</span><span class="what">M&amp;S confirms a "cyber incident." DragonForce sends a taunting message to CEO Stuart Machin from a compromised employee mailbox.</span></li>
+      <li><span class="when">Apr 24, 2025</span><span class="what">The DragonForce ransomware encryptor is deployed against M&amp;S's VMware ESXi hosts and virtual machines.</span></li>
+      <li><span class="when">Apr 25, 2025</span><span class="what">M&amp;S pulls the plug on its website and mobile app, halting all online orders outright.</span></li>
+      <li><span class="when">Late Apr 2025</span><span class="what">M&amp;S confirms customer personal data was stolen in the breach; contactless payment and Click &amp; Collect remain down in stores.</span></li>
+      <li><span class="when">Jun–Jul 2025</span><span class="what">Online ordering is gradually restored after roughly six weeks dark. M&amp;S guides investors to an approximate £300m hit to annual profit.</span></li>
+    </ul>
+
+    <h3 class="section-label">Attack chain</h3>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-body"><h4>Vishing the helpdesk</h4><p>Attackers phoned M&amp;S's outsourced IT helpdesk, impersonating an employee to request account help.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-body"><h4>Privileged MFA reset</h4><p>The helpdesk agent reset multi-factor authentication on a privileged account without adequate identity verification — the entire chain starts here.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-body"><h4>Credential access via NTDS.dit</h4><p>With privileged access, attackers exfiltrated the domain controller's NTDS.dit file — the core Active Directory database holding password hashes for every domain user.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-body"><h4>Offline hash cracking</h4><p>Hashes were cracked offline, yielding cleartext credentials across a wide range of accounts — no further contact with M&amp;S's systems required to do it.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">5</div>
+        <div class="chain-body"><h4>Ransomware on the hypervisor layer</h4><p>The DragonForce encryptor was deployed directly against VMware ESXi hosts and VMs — encrypting the virtualization layer itself rather than individual servers one at a time.</p></div>
+      </div>
+    </div>
+
+    <div class="lessons">
+      <h3>Lessons learned</h3>
+      <ul>
+        <li>A phone call should never be sufficient to reset MFA or credentials on a privileged account — require an out-of-band, verifiable identity check every time, no exceptions for "urgent" requests.</li>
+        <li>Segment the identity plane from the hypervisor management plane. One stolen NTDS.dit shouldn't be a straight line to encrypting every virtual machine in the estate.</li>
+        <li>Keep immutable, offline backups — and actually rehearse restoring from them, not just taking them.</li>
+        <li>Have a named, rehearsed crisis-communications plan. M&amp;S drew criticism for slow, sparse updates while online sales sat dark for weeks.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="incident" id="coop">
+    <div class="incident-head">
+      <div class="incident-eyebrow">Retail / Mass Data Theft</div>
+      <h2>Co-op</h2>
+      <div class="incident-badges">
+        <span class="badge badge-sector">Retail</span>
+        <span class="badge badge-actor">Scattered Spider / DragonForce</span>
+        <span class="badge badge-date">April–July 2025</span>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n">6.5m</div><div class="l">Members' data stolen</div></div>
+      <div class="stat"><div class="n">£80m</div><div class="l">Operating profit hit ($107m)</div></div>
+      <div class="stat"><div class="n small">No ransomware</div><div class="l">Self-contained before encryption</div></div>
+    </div>
+
+    <h3 class="section-label">Timeline</h3>
+    <ul class="timeline">
+      <li><span class="when">Late Apr 2025</span><span class="what">Attackers use the same helpdesk social-engineering playbook seen at M&amp;S to obtain privileged credentials inside Co-op's network.</span></li>
+      <li><span class="when">May 2, 2025</span><span class="what">Co-op discloses that limited member data was accessed and proactively shuts down parts of its IT systems — back-office and call-centre infrastructure — as a precaution following the attempted unauthorised access.</span></li>
+      <li><span class="when">Jul 10, 2025</span><span class="what">The UK National Crime Agency arrests four people, aged 17–20, in connection with the M&amp;S, Co-op, and Harrods attacks.</span></li>
+      <li><span class="when">Jul 16, 2025</span><span class="what">Co-op's internal investigation concludes hackers actually stole the personal data of all 6.5 million Co-op members during the April intrusion — far more than the "limited" scope first disclosed.</span></li>
+      <li><span class="when">H1 2025 results</span><span class="what">Co-op reports an £80m (~$107m) hit to operating profit tied directly to the attack.</span></li>
+    </ul>
+
+    <h3 class="section-label">Attack chain</h3>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-body"><h4>Helpdesk vishing</h4><p>Attackers impersonated a privileged user — the kind of target research typically points at a senior IT administrator — and called the helpdesk requesting a password reset and MFA deactivation.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-body"><h4>Credential access, no malware</h4><p>Valid privileged credentials were obtained without deploying any malware or tooling, keeping the activity outside the visibility of endpoint detection and response (EDR) systems.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-body"><h4>Data exfiltration</h4><p>The attacker accessed and exfiltrated the member database before Co-op could fully contain the intrusion.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-body"><h4>Proactive containment</h4><p>Co-op shut down back-office and call-centre systems itself — a fast, self-initiated move that likely prevented the ransomware-encryption stage seen at M&amp;S.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">5</div>
+        <div class="chain-body"><h4>Delayed scope discovery</h4><p>The true scale — all 6.5 million members — only became clear after further investigation, revealed more than two months after the initial, much narrower disclosure.</p></div>
+      </div>
+    </div>
+
+    <div class="lessons">
+      <h3>Lessons learned</h3>
+      <ul>
+        <li>Co-op had run red-team and simulated-attack exercises beforehand — but real-world pressure let attackers bypass the very defenses those exercises were meant to harden. Preparation alone isn't proof against a good pretext call.</li>
+        <li>No malware means no EDR alert. When the entire "exploit" is a phone call and a valid login, detection has to happen at the identity layer — anomalous privileged logins, unexpected MFA-device changes — not the endpoint.</li>
+        <li>Initial disclosures may undercount scope. Plan legal and communications exposure around the realistic worst case, not the number confirmed on day one.</li>
+        <li>Fast, self-initiated containment can be the difference between a data-theft incident and a full ransomware-encryption event — compare Co-op's outcome directly against M&amp;S's.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="incident" id="harrods">
+    <div class="incident-head">
+      <div class="incident-eyebrow">Retail / Two Incidents, One Year</div>
+      <h2>Harrods</h2>
+      <div class="incident-badges">
+        <span class="badge badge-sector">Retail</span>
+        <span class="badge badge-actor">Scattered Spider (May) / Third-party (Sept)</span>
+        <span class="badge badge-date">May &amp; September 2025</span>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n badge-good" style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:15px;">Contained</div><div class="l">May incident outcome</div></div>
+      <div class="stat"><div class="n">430,000</div><div class="l">Customers hit in Sept incident</div></div>
+      <div class="stat"><div class="n small">Third-party supplier</div><div class="l">Sept breach source</div></div>
+    </div>
+
+    <h3 class="section-label">Timeline</h3>
+    <ul class="timeline">
+      <li><span class="when">May 1, 2025</span><span class="what">Harrods becomes the third major UK retailer hit within a week, after M&amp;S and Co-op. Internal monitoring flags suspicious activity on the network.</span></li>
+      <li><span class="when">May 1–2, 2025</span><span class="what">Harrods restricts internet access across all its sites almost immediately, containing the intrusion before data can be compromised. GCHQ's National Cyber Security Centre is looped in.</span></li>
+      <li><span class="when">May 3, 2025</span><span class="what">Harrods confirms the attack was contained early, with no customer data accessed — the clearest "win" in this wave of UK retail attacks.</span></li>
+      <li><span class="when">Jul 10, 2025</span><span class="what">Four people aged 17–20 are arrested by the UK National Crime Agency in connection with the M&amp;S, Co-op, and Harrods attacks.</span></li>
+      <li><span class="when">Sep 2025</span><span class="what">A second, unrelated Harrods incident: attackers breach a third-party supplier's systems, exposing data on roughly 430,000 customers. No passwords or financial data are included; Harrods attributes the breach to the supplier, not its own network.</span></li>
+    </ul>
+
+    <h3 class="section-label">Attack chain</h3>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-body"><h4>Attempted intrusion (May)</h4><p>Attackers attempt unauthorized access using tactics consistent with the same wave hitting M&amp;S and Co-op; Harrods' internal monitoring catches it in progress.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-body"><h4>Rapid isolation</h4><p>Internet access is cut across all Harrods sites almost immediately, denying the attacker time to move laterally or exfiltrate anything.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-body"><h4>Contained, no loss</h4><p>The May incident closes with no customer data accessed — a rare clean outcome against this attacker wave.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-body"><h4>Third-party compromise (Sept)</h4><p>A supplier holding Harrods customer data is separately breached, entirely outside Harrods' own network.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">5</div>
+        <div class="chain-body"><h4>Downstream exposure</h4><p>Despite Harrods' own systems staying clean, roughly 430,000 customers' data is exposed anyway, via the supplier.</p></div>
+      </div>
+    </div>
+
+    <div class="lessons">
+      <h3>Lessons learned</h3>
+      <ul>
+        <li>Speed of detection and response genuinely changes outcomes — Harrods' May incident is the clearest evidence in this whole set that fast isolation can stop a Scattered-Spider-style intrusion before any data leaves the building.</li>
+        <li>Your security perimeter includes your suppliers. The September breach shows a well-defended core network doesn't protect customer data sitting inside a third party's systems.</li>
+        <li>Vet and monitor third-party data processors the same way you'd audit your own environment — "we weren't breached, our supplier was" is a distinction that means nothing to the affected customer.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="incident" id="jlr">
+    <div class="incident-head">
+      <div class="incident-eyebrow">Manufacturing / Production Shutdown</div>
+      <h2>Jaguar Land Rover</h2>
+      <div class="incident-badges">
+        <span class="badge badge-sector">Automotive Manufacturing</span>
+        <span class="badge badge-actor">Scattered Lapsus$ Hunters</span>
+        <span class="badge badge-date">Aug–Oct 2025</span>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="n">~5 wks</div><div class="l">Global production halted</div></div>
+      <div class="stat"><div class="n">£1.9bn</div><div class="l">Est. total UK economic damage</div></div>
+      <div class="stat"><div class="n">£1.5bn</div><div class="l">Govt-guaranteed loan to suppliers</div></div>
+      <div class="stat"><div class="n">6 / 4</div><div class="l">Plants shut / countries affected</div></div>
+    </div>
+
+    <h3 class="section-label">Timeline</h3>
+    <ul class="timeline">
+      <li><span class="when">Weeks prior</span><span class="what">A vishing and spear-phishing campaign targets JLR's IT helpdesk and employees with elevated access — the believed foothold, consistent with the wider "Scattered Lapsus$ Hunters" collective's playbook.</span></li>
+      <li><span class="when">Aug 31, 2025</span><span class="what">The intrusion begins; attackers move laterally through JLR's corporate network largely undetected.</span></li>
+      <li><span class="when">Sep 1, 2025</span><span class="what">JLR discovers the breach and proactively shuts down its global IT systems to contain the intruder.</span></li>
+      <li><span class="when">Sep 2, 2025</span><span class="what">JLR publicly confirms it has been "impacted by a cyber incident" and pauses production as a precaution.</span></li>
+      <li><span class="when">Mid-Sep 2025</span><span class="what">UK plants at Solihull, Halewood, and Wolverhampton sit idle alongside overseas plants in Slovakia, Brazil, and India; staff are told to stay home and suppliers begin laying off workers.</span></li>
+      <li><span class="when">Sep 16, 2025</span><span class="what">JLR extends the shutdown to at least September 24 as forensic analysis and remediation continue.</span></li>
+      <li><span class="when">Sep 23, 2025</span><span class="what">The restart date slips again, this time to October 1.</span></li>
+      <li><span class="when">Sep 29, 2025</span><span class="what">The UK government announces an up-to-£1.5bn loan guarantee via UK Export Finance to stabilise JLR's supplier base.</span></li>
+      <li><span class="when">Early Oct 2025</span><span class="what">Phased production restart begins after roughly five weeks fully offline — reported as the most economically damaging cyberattack in British history.</span></li>
+    </ul>
+
+    <h3 class="section-label">Attack chain</h3>
+    <div class="chain">
+      <div class="chain-step">
+        <div class="chain-num">1</div>
+        <div class="chain-body"><h4>Vishing / spear-phishing</h4><p>A helpdesk password-reset pretext combined with targeted phishing of employees holding elevated access — the same social-engineering entry point used against M&amp;S and Co-op weeks earlier.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">2</div>
+        <div class="chain-body"><h4>Credential access</h4><p>Attackers gained a foothold using fraudulently obtained credentials; some reporting also points to reuse of stolen third-party credentials (e.g. from Jira) seen in other campaigns by the same actors.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">3</div>
+        <div class="chain-body"><h4>Lateral movement</h4><p>The attacker moved through JLR's corporate network over several weeks, largely undetected, before launching the primary assault.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">4</div>
+        <div class="chain-body"><h4>Escalation toward manufacturing-adjacent systems</h4><p>The intrusion reached systems tied closely enough to production that JLR's only reliable containment option was shutting down IT infrastructure wholesale.</p></div>
+      </div>
+      <div class="chain-step">
+        <div class="chain-num">5</div>
+        <div class="chain-body"><h4>Impact: global production halt</h4><p>Manufacturing stopped for roughly five weeks across six plants in four countries while forensics, remediation, and a safe rebuild took place.</p></div>
+      </div>
+    </div>
+
+    <div class="lessons">
+      <h3>Lessons learned</h3>
+      <ul>
+        <li>Helpdesk identity verification is the recurring single point of failure across 2025's biggest UK breaches — treat it as a hard control, not a soft process.</li>
+        <li>Segment corporate IT from manufacturing/OT networks. A corporate breach shouldn't force a full production-line shutdown as the only available containment option.</li>
+        <li>Audit and rotate credentials across every connected SaaS tool. Reused or stolen third-party credentials (e.g. Jira) were a recurring entry point across this actor collective's other campaigns.</li>
+        <li>Map single points of failure in the physical supply chain — weeks of downtime cascaded into supplier layoffs and ultimately a government-backed loan, showing how fast cyber risk becomes balance-sheet and national-economic risk.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="shared" id="shared">
+    <h2>Shared Pattern</h2>
+    <p><strong>2017 vs. 2025 — the attack shape shifted.</strong> Musgrave's incident was malware-first: code quietly placed near the payment path to scrape card data, caught by monitoring before any confirmed theft. Nothing about it depended on tricking a human being. Eight years later, none of the four 2025 incidents needed malware to get in at all.</p>
+    <p><strong>The 2025 wave shares one entry point.</strong> M&amp;S, Co-op, and Harrods' May incident all trace to the same identity-first playbook within roughly a two-week span in April–May 2025: call the helpdesk, impersonate a privileged user, talk your way into an MFA or password reset. JLR was hit by the same playbook months later. The UK National Crime Agency ultimately arrested four people (aged 17–20) on 10 July 2025 in connection with the M&amp;S, Co-op, and Harrods attacks.</p>
+    <p><strong>Severity was decided after the door opened, not by attacker sophistication.</strong> M&amp;S had a path from stolen credentials straight to its hypervisor layer, so it became a ransomware-encryption event. Co-op contained itself before that stage, so it became a mass data-theft event instead. Harrods detected and isolated within hours in May, so it lost nothing — then lost data anyway in September through a supplier it didn't control. JLR's compromise reached close enough to production that a full IT shutdown was the only safe containment, turning an identity breach into a five-week manufacturing outage. Same front door in four of five cases; the blast radius was entirely a function of architecture and response speed, not how the attacker got in.</p>
+  </div>
+
+  <div class="sources" id="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li><a href="https://www.techcentral.ie/musgrave-hit-cyberattack/" target="_blank" rel="noopener">TechCentral.ie — Musgrave hit by cyberattack</a></li>
+      <li><a href="https://www.newstalk.com/news/musgrave-cyber-attack-targeted-customer-card-infromation-522551" target="_blank" rel="noopener">Newstalk — Musgrave cyber attack targeted customer card information</a></li>
+      <li><a href="https://www.cm-alliance.com/marks-spencer-cyber-attack-timeline" target="_blank" rel="noopener">CM-Alliance — Marks &amp; Spencer Cyber Attack Timeline</a></li>
+      <li><a href="https://www.bleepingcomputer.com/news/security/marks-and-spencer-breach-linked-to-scattered-spider-ransomware-attack/" target="_blank" rel="noopener">BleepingComputer — M&amp;S breach linked to Scattered Spider ransomware attack</a></li>
+      <li><a href="https://www.blackfog.com/marks-and-spencer-ransomware-attack/" target="_blank" rel="noopener">BlackFog — How a ransomware attack crippled a UK retail giant</a></li>
+      <li><a href="https://www.aljazeera.com/news/2025/5/2/harrods-ms-hit-by-cyberattack-what-happened-whos-behind-it" target="_blank" rel="noopener">Al Jazeera — Harrods, M&amp;S hit by cyberattack</a></li>
+      <li><a href="https://www.bleepingcomputer.com/news/security/co-op-says-it-lost-107-million-after-scattered-spider-attack/" target="_blank" rel="noopener">BleepingComputer — Co-op says it lost $107 million after Scattered Spider attack</a></li>
+      <li><a href="https://thehackernews.com/2025/06/scattered-spider-behind-cyberattacks-on.html" target="_blank" rel="noopener">The Hacker News — Scattered Spider behind cyberattacks on M&amp;S and Co-op</a></li>
+      <li><a href="https://www.cybersecuritydive.com/news/uk-retailer-co-op-restoring-systems-following-major-cyberattack/748090/" target="_blank" rel="noopener">Cybersecurity Dive — Co-op restoring systems following major cyberattack</a></li>
+      <li><a href="https://www.theregister.com/2025/05/02/ncsc_steps_in_as_harrods/" target="_blank" rel="noopener">The Register — Harrods confirms cyberattack, NCSC steps in</a></li>
+      <li><a href="https://www.computing.co.uk/news/2025/security/harrods-blames-supplier-for-second-cyberattack-of-2025" target="_blank" rel="noopener">Computing — Harrods blames supplier for second cyberattack of 2025</a></li>
+      <li><a href="https://cypro.co.uk/insights/harrods-cyber-attack-2025/" target="_blank" rel="noopener">Cypro — Harrods Cyber Attack 2025: Two Incidents, One Year</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Jaguar_Land_Rover_cyberattack" target="_blank" rel="noopener">Wikipedia — Jaguar Land Rover cyberattack</a></li>
+      <li><a href="https://industrialcyber.co/manufacturing/jaguar-land-rover-cyberattack-deepens-with-prolonged-production-outage-supply-chain-fallout/" target="_blank" rel="noopener">Industrial Cyber — JLR cyberattack deepens, production outage &amp; supply chain fallout</a></li>
+      <li><a href="https://treblle.com/blog/jlr-breach-breakdown-analysis" target="_blank" rel="noopener">Treblle — JLR Breach Breakdown: Analysis of the Jaguar Land Rover Hack</a></li>
+      <li><a href="https://www.cyfirma.com/research/investigation-report-on-jaguar-land-rover-cyberattack/" target="_blank" rel="noopener">CYFIRMA — Investigation Report on Jaguar Land Rover Cyberattack</a></li>
+      <li><a href="https://techcrunch.com/2025/09/29/uk-government-bails-out-jaguar-land-rover-with-1-5b-loan-after-hack-disrupts-vehicle-production-for-weeks/" target="_blank" rel="noopener">TechCrunch — UK government bails out JLR with £1.5B loan</a></li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  Compiled from public reporting for reference and awareness training — treat dollar/pound figures and disputed attribution details as approximate and subject to revision as investigations conclude.
+</footer>
+
+</body>
+</html>
